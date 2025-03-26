@@ -5,14 +5,16 @@
 #include <algorithm>
 #include <string>
 
+using namespace std;
+
 class FirstFollowCalculator {
 private:
     // Grammar representation
-    std::map<char, std::vector<std::string>> productions;
+    map<char, vector<string>> productions;
     // Set of non-terminals
-    std::set<char> non_terminals;
+    set<char> non_terminals;
     // Set of terminals
-    std::set<char> terminals;
+    set<char> terminals;
 
     // Helper function to check if a symbol is a non-terminal
     bool is_non_terminal(char symbol) {
@@ -20,8 +22,8 @@ private:
     }
 
     // Calculate FIRST set for a single symbol
-    std::set<char> calculate_first_of_symbol(char symbol) {
-        std::set<char> first_set;
+    set<char> calculate_first_of_symbol(char symbol) {
+        set<char> first_set;
         
         // If it's a terminal, FIRST is the symbol itself
         if (!is_non_terminal(symbol) && symbol != 'e') {
@@ -40,7 +42,7 @@ private:
             bool can_derive_epsilon = true;
             
             for (char first_symbol : production) {
-                std::set<char> current_first = calculate_first_of_symbol(first_symbol);
+                set<char> current_first = calculate_first_of_symbol(first_symbol);
                 
                 // Add all non-epsilon symbols from current symbol's FIRST
                 for (char f : current_first) {
@@ -66,12 +68,12 @@ private:
     }
 
     // Calculate FIRST set for a string of symbols
-    std::set<char> calculate_first_of_string(const std::string& str) {
-        std::set<char> first_set;
+    set<char> calculate_first_of_string(const string& str) {
+        set<char> first_set;
         bool can_derive_epsilon = true;
         
         for (char symbol : str) {
-            std::set<char> current_first = calculate_first_of_symbol(symbol);
+            set<char> current_first = calculate_first_of_symbol(symbol);
             
             // Add non-epsilon symbols
             for (char f : current_first) {
@@ -96,8 +98,8 @@ private:
     }
 
     // Calculate FOLLOW sets
-    std::map<char, std::set<char>> calculate_follow_sets() {
-        std::map<char, std::set<char>> follow_sets;
+    map<char, set<char>> calculate_follow_sets() {
+        map<char, set<char>> follow_sets;
         
         // Add $ (end of input) to start symbol's FOLLOW
         char start_symbol = productions.begin()->first;
@@ -114,7 +116,7 @@ private:
                         if (is_non_terminal(production[i])) {
                             // Case 1: A → αBβ, add FIRST(β) - ε to FOLLOW(B)
                             if (i + 1 < production.length()) {
-                                std::set<char> first_of_next = calculate_first_of_symbol(production[i + 1]);
+                                set<char> first_of_next = calculate_first_of_symbol(production[i + 1]);
                                 size_t original_size = follow_sets[production[i]].size();
                                 
                                 for (char f : first_of_next) {
@@ -153,7 +155,7 @@ private:
 
 public:
     // Add a production to the grammar
-    void add_production(char non_terminal, const std::string& production) {
+    void add_production(char non_terminal, const string& production) {
         productions[non_terminal].push_back(production);
         non_terminals.insert(non_terminal);
         
@@ -167,28 +169,28 @@ public:
 
     // Calculate and print FIRST sets
     void print_first_sets() {
-        std::cout << "FIRST SETS:\n";
+        cout << "FIRST SETS:\n";
         for (char non_terminal : non_terminals) {
-            std::cout << "FIRST(" << non_terminal << ") = { ";
-            std::set<char> first_set = calculate_first_of_symbol(non_terminal);
+            cout << "FIRST(" << non_terminal << ") = { ";
+            set<char> first_set = calculate_first_of_symbol(non_terminal);
             for (char f : first_set) {
-                std::cout << (f == 'e' ? "ε" : std::string(1, f)) << " ";
+                cout << (f == 'e' ? "ε" : string(1, f)) << " ";
             }
-            std::cout << "}\n";
+            cout << "}\n";
         }
     }
 
     // Calculate and print FOLLOW sets
     void print_follow_sets() {
-        std::map<char, std::set<char>> follow_sets = calculate_follow_sets();
+        map<char, set<char>> follow_sets = calculate_follow_sets();
         
-        std::cout << "\nFOLLOW SETS:\n";
+        cout << "\nFOLLOW SETS:\n";
         for (char non_terminal : non_terminals) {
-            std::cout << "FOLLOW(" << non_terminal << ") = { ";
+            cout << "FOLLOW(" << non_terminal << ") = { ";
             for (char f : follow_sets[non_terminal]) {
-                std::cout << (f == 'e' ? "ε" : std::string(1, f)) << " ";
+                cout << (f == 'e' ? "ε" : string(1, f)) << " ";
             }
-            std::cout << "}\n";
+            cout << "}\n";
         }
     }
 };
